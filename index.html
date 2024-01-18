@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitHub Profile Viewer</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #886BD8;
+      margin: 0;
+      padding: 0;
+      color: white;
+
+    }
+
+    #profile {
+      max-width: 400px;
+      width: 100%;
+      margin: 10vw;
+      background-color: #06048e5d;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      text-align: center;
+      height: 400px;
+      position: fixed;
+    }
+
+    #profile img {
+      border-radius: 50%;
+      max-width: 100px;
+      margin-bottom: 10px;
+    }
+
+    #profile p {
+
+      margin: 10px 0;
+    }
+
+    #repositories {
+      max-width: 500px;
+      width: 90%;
+      margin: 20px auto;
+      background-color: #06048e21;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      text-align: left;
+      position: absolute;
+      right: 10vw;
+
+    }
+
+    .repo {
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+    }
+
+    .repo p {
+      margin: 5px 0;
+      color: black;
+      font-size: 16px;
+      font-weight: bolder;
+    }
+
+    #container {
+      display: flex;
+    }
+
+    #repositories h2 {
+      text-align: center;
+    }
+
+    .user-repos {
+      overflow: scroll;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        background-image: url("bgw.png");
+        background-repeat: no-repeat;
+        background-size: cover;
+      }
+
+      #container {
+        flex-direction: column;
+      }
+
+      #profile {
+        position: static;
+        max-width: 80vw;
+        margin: auto;
+      }
+
+      #repositories {
+        position: static;
+        max-width: 80vw;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="container">
+    <div id="profile">
+      <h2>GitHub Profile Viewer</h2>
+      <div id="user-profile"></div>
+    </div>
+    <div id="repositories">
+      <h2>Repositories</h2>
+      <div id="user-repos"></div>
+    </div>
+  </div>
+  </div>
+
+
+  <script>
+    const username = prompt('Enter UserName', "iamtidu");
+    const apiUrl = `https://api.github.com/users/${username}`;
+    const reposUrl = `https://api.github.com/users/${username}/repos`;
+
+    async function fetchData(url) {
+      const response = await fetch(url);
+      const data = await response.json();
+      return data;
+    }
+
+    async function renderUserProfile() {
+      try {
+        const userData = await fetchData(apiUrl);
+        const userProfile = document.getElementById('user-profile');
+
+        userProfile.innerHTML = `
+        <img src="${userData.avatar_url}" alt="Avatar">
+        <h3>${userData.name}</h3>
+        <p>${userData.bio || 'No bio available'}</p>
+        <p>Followers: ${userData.followers} | Following: ${userData.following}</p>
+        <p>Public Repositories: ${userData.public_repos}</p>
+      `;
+      } catch (error) {
+        console.error('Error fetching user profile data:', error);
+      }
+    }
+
+    async function renderUserRepositories() {
+      try {
+        const reposData = await fetchData(reposUrl);
+        const userRepos = document.getElementById('user-repos');
+
+        userRepos.innerHTML = reposData.map(repo => `
+        <div class="repo">
+          <h3>${repo.name}</h3>
+          <p>${repo.description || 'No description available'}</p>
+          <p>Language: ${repo.language || 'Not specified'}</p>
+        </div>
+      `).join('');
+      } catch (error) {
+        console.error('Error fetching user repositories data:', error);
+      }
+    }
+
+    renderUserProfile();
+    renderUserRepositories();
+  </script>
+
+</body>
+
+</html>
